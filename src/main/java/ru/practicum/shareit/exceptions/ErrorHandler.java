@@ -12,13 +12,13 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public Map<String, String> EntityNotFoundException(final EntityNotFoundException e) {
+    public Map<String, String> entityNotFoundException(final EntityNotFoundException e) {
         return Map.of("404", e.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
-    public Map<String, String> ConflictException(final ConflictException e) {
+    public Map<String, String> conflictException(final ConflictException e) {
         return Map.of("409", e.getMessage());
     }
 
