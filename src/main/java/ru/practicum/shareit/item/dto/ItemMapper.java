@@ -15,7 +15,8 @@ public class ItemMapper {
                 itemDto.getName(),
                 itemDto.getDescription(),
                 itemDto.getAvailable(),
-                itemDto.getOwner()
+                itemDto.getOwner(),
+                null
         );
     }
 
@@ -26,7 +27,9 @@ public class ItemMapper {
                 item.getName(),
                 item.getDescription(),
                 item.getAvailable(),
-                item.getOwner()
+                item.getOwner(),
+                // Поле на данном этапе не нужно, но приведено в советах ментора к ТЗ 13 спринта
+                item.getRequest() != null ? item.getRequest().getId() : null
         );
     }
 
