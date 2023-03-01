@@ -80,8 +80,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     private boolean isUsersMailInBase(User user) {
-        List<User> repeats = users.values()
-                .stream()
+        List<User> repeats = users.values().stream()
                 .filter(u -> u.getEmail().equals(user.getEmail()))
                 .collect(Collectors.toList());
         return repeats.size() != 0;

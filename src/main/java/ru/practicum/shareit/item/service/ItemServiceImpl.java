@@ -5,12 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemMapper;
-import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.storage.ItemStorage;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserMapper;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -30,17 +30,21 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Item getItem(Long itemId, Long userId) {
-        return itemStorage.getItem(itemId);
+    public ItemDto getItem(Long itemId, Long userId) {
+        return ItemMapper.toItemDto(itemStorage.getItem(itemId));
     }
 
     @Override
-    public List<Item> getItemsByUser(Long userId) {
-        return itemStorage.getItemsByUser(userId);
+    public List<ItemDto> getItemsByUser(Long userId) {
+        return itemStorage.getItemsByUser(userId).stream()
+                .map(ItemMapper::toItemDto)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<Item> getAvailableItems(Long userId, String text) {
-        return itemStorage.getAvailableItems(userId, text);
+    public List<ItemDto> getAvailableItems(Long userId, String text) {
+        return itemStorage.getAvailableItems(userId, text).stream()
+                .map(ItemMapper::toItemDto)
+                .collect(Collectors.toList());
     }
 }

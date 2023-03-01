@@ -6,10 +6,6 @@ import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDateTime;
 
-/**
- * TODO Sprint add-bookings.
- *  Класс сделан по советам ментора к ТЗ 13
- */
 @Data
 public class Booking {
     private Long id;

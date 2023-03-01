@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.user.service.UserService;
-import ru.practicum.shareit.item.model.Item;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -45,21 +44,21 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public Item getItem(@PathVariable("itemId") Long itemId,
-                        @RequestHeader("X-Sharer-User-Id") Long userId) {
+    public ItemDto getItem(@PathVariable("itemId") Long itemId,
+                           @RequestHeader("X-Sharer-User-Id") Long userId) {
         log.info("GET /items/{} : get item by ID from user ID {}", itemId, userId);
         return itemService.getItem(itemId, userId);
     }
 
     @GetMapping
-    public List<Item> getItemsByUser(@RequestHeader("X-Sharer-User-Id") Long userId) {
+    public List<ItemDto> getItemsByUser(@RequestHeader("X-Sharer-User-Id") Long userId) {
         log.info("GET /items : get list of items from user ID {}", userId);
         return itemService.getItemsByUser(userId);
     }
 
     @GetMapping("/search")
-    public List<Item> getAvailableItems(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                        @RequestParam String text) {
+    public List<ItemDto> getAvailableItems(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                           @RequestParam String text) {
         log.info("GET /items : get list of available items of user ID {} with text {}", userId, text);
         return itemService.getAvailableItems(userId, text);
     }
