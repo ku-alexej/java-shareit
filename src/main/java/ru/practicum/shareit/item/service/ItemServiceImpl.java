@@ -4,10 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.dto.ItemMapper;
 import ru.practicum.shareit.item.storage.ItemStorage;
+import ru.practicum.shareit.mapper.EntityMapper;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.dto.UserMapper;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,33 +17,34 @@ import java.util.stream.Collectors;
 public class ItemServiceImpl implements ItemService {
 
     private final ItemStorage itemStorage;
+    private final EntityMapper mapper;
 
     @Override
     public ItemDto createItem(UserDto userDto, ItemDto itemDto) {
-        return ItemMapper.toItemDto(itemStorage.createItem(UserMapper.toUser(userDto), ItemMapper.toItem(itemDto)));
+        return mapper.toItemDto(itemStorage.createItem(mapper.toUser(userDto), mapper.toItem(itemDto)));
     }
 
     @Override
     public ItemDto updateItem(Long itemId, ItemDto itemDto, Long userId) {
-        return ItemMapper.toItemDto(itemStorage.updateItem(itemId, ItemMapper.toItem(itemDto), userId));
+        return mapper.toItemDto(itemStorage.updateItem(itemId, mapper.toItem(itemDto), userId));
     }
 
     @Override
     public ItemDto getItem(Long itemId, Long userId) {
-        return ItemMapper.toItemDto(itemStorage.getItem(itemId));
+        return mapper.toItemDto(itemStorage.getItem(itemId));
     }
 
     @Override
     public List<ItemDto> getItemsByUser(Long userId) {
         return itemStorage.getItemsByUser(userId).stream()
-                .map(ItemMapper::toItemDto)
+                .map(mapper::toItemDto)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<ItemDto> getAvailableItems(Long userId, String text) {
         return itemStorage.getAvailableItems(userId, text).stream()
-                .map(ItemMapper::toItemDto)
+                .map(mapper::toItemDto)
                 .collect(Collectors.toList());
     }
 }
