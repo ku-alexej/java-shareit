@@ -11,6 +11,12 @@ import java.util.Map;
 public class ErrorHandler {
 
     @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> entityNotAvailable(final EntityNotAvailable e) {
+        return Map.of("400", e.getMessage());
+    }
+
+    @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public Map<String, String> entityNotFoundException(final EntityNotFoundException e) {
         return Map.of("404", e.getMessage());
@@ -22,4 +28,15 @@ public class ErrorHandler {
         return Map.of("409", e.getMessage());
     }
 
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public Map<String, String> serverError(final ServerError e) {
+        return Map.of("500", e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse UnsupportedStateErrorResponse(final UnsupportedState e) {
+        return new ErrorResponse(e.getMessage());
+    }
 }

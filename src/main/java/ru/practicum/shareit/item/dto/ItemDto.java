@@ -2,6 +2,7 @@ package ru.practicum.shareit.item.dto;
 
 import jdk.jfr.BooleanFlag;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import ru.practicum.shareit.user.model.User;
 
@@ -11,6 +12,7 @@ import javax.validation.constraints.NotNull;
 
 @Data
 @AllArgsConstructor
+@Builder
 public class ItemDto {
 
     private Long id;
