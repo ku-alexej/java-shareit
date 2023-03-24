@@ -36,7 +36,7 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse UnsupportedStateErrorResponse(final UnsupportedState e) {
+    public ErrorResponse unsupportedState(final UnsupportedState e) {
         return new ErrorResponse(e.getMessage());
     }
 }
