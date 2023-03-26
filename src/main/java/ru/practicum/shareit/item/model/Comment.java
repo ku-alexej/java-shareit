@@ -1,12 +1,11 @@
 package ru.practicum.shareit.item.model;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.Hibernate;
+import lombok.EqualsAndHashCode;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.Column;
@@ -18,16 +17,15 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
-import java.util.Objects;
 
 @Entity
 @Table(name = "comments")
 @Getter
 @Setter
 @ToString
+@EqualsAndHashCode
 @RequiredArgsConstructor
 @AllArgsConstructor
-@Builder
 public class Comment {
 
     @Id
@@ -49,16 +47,4 @@ public class Comment {
     @Column(name = "create_date")
     private LocalDateTime created;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        Comment comment = (Comment) o;
-        return id != null && Objects.equals(id, comment.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
-    }
 }

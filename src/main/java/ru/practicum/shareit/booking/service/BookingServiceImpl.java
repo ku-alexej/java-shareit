@@ -10,7 +10,10 @@ import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.State;
 import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.booking.repository.BookingRepository;
-import ru.practicum.shareit.exceptions.*;
+import ru.practicum.shareit.exceptions.EntityNotAvailable;
+import ru.practicum.shareit.exceptions.EntityNotFoundException;
+import ru.practicum.shareit.exceptions.ServerError;
+import ru.practicum.shareit.exceptions.UnsupportedState;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.mapper.EntityMapper;
@@ -27,6 +30,8 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class BookingServiceImpl implements BookingService {
+
+    private final Sort SORT = Sort.by(Sort.Direction.DESC, "start");
 
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
@@ -90,23 +95,23 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<AnswerBookingDto> getAllBookingByUser(Long userId, String rawState) {
         State state = getState(rawState);
-        User booker = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User with ID " + userId + " does not exist"));
+        if (!userRepository.existsById(userId)) {
+            throw new EntityNotFoundException("User with ID " + userId + " does not exist");
+        }
         List<Booking> bookings = new ArrayList<>();
-        Sort sort = Sort.by(Sort.Direction.DESC, "start");
         switch (state) {
             case ALL:
                 bookings = bookingRepository.findAllByBooker_IdOrderByStartDesc(userId);
                 break;
             case PAST:
-                bookings = bookingRepository.findAllByBooker_IdAndEndIsBefore(userId, LocalDateTime.now(), sort);
+                bookings = bookingRepository.findAllByBooker_IdAndEndIsBefore(userId, LocalDateTime.now(), SORT);
                 break;
             case FUTURE:
-                bookings = bookingRepository.findAllByBooker_IdAndStartIsAfter(userId, LocalDateTime.now(), sort);
+                bookings = bookingRepository.findAllByBooker_IdAndStartIsAfter(userId, LocalDateTime.now(), SORT);
                 break;
             case CURRENT:
                 bookings = bookingRepository.findAllByBooker_IdAndStartIsBeforeAndEndIsAfter(
-                        userId, LocalDateTime.now(), LocalDateTime.now(), sort);
+                        userId, LocalDateTime.now(), LocalDateTime.now(), SORT);
                 break;
             case WAITING:
                 bookings = bookingRepository.findAllByBooker_IdAndStatus(userId, Status.WAITING);
@@ -124,23 +129,23 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<AnswerBookingDto> getAllBookingByOwner(Long userId, String rawState) {
         State state = getState(rawState);
-        User owner = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User with ID " + userId + " does not exist"));
+        if (!userRepository.existsById(userId)) {
+            throw new EntityNotFoundException("User with ID " + userId + " does not exist");
+        }
         List<Booking> bookings = new ArrayList<>();
-        Sort sort = Sort.by(Sort.Direction.DESC, "start");
         switch (state) {
             case ALL:
                 bookings = bookingRepository.findAllByItem_Owner_IdOrderByStartDesc(userId);
                 break;
             case PAST:
-                bookings = bookingRepository.findAllByItem_Owner_IdAndEndIsBefore(userId, LocalDateTime.now(), sort);
+                bookings = bookingRepository.findAllByItem_Owner_IdAndEndIsBefore(userId, LocalDateTime.now(), SORT);
                 break;
             case FUTURE:
-                bookings = bookingRepository.findAllByItem_Owner_IdAndStartIsAfter(userId, LocalDateTime.now(), sort);
+                bookings = bookingRepository.findAllByItem_Owner_IdAndStartIsAfter(userId, LocalDateTime.now(), SORT);
                 break;
             case CURRENT:
                 bookings = bookingRepository.findAllByItem_Owner_IdAndStartIsBeforeAndEndIsAfter(
-                        userId, LocalDateTime.now(), LocalDateTime.now(), sort);
+                        userId, LocalDateTime.now(), LocalDateTime.now(), SORT);
                 break;
             case WAITING:
                 bookings = bookingRepository.findAllByItem_Owner_IdAndStatus(userId, Status.WAITING);
@@ -150,7 +155,7 @@ public class BookingServiceImpl implements BookingService {
                 break;
         }
 
-        return bookings.isEmpty() ? Collections.emptyList() : bookings.stream()
+        return bookings.stream()
                 .map(mapper::toAnswerBookingDto)
                 .collect(Collectors.toList());
     }

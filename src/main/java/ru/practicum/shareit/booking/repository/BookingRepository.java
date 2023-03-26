@@ -3,6 +3,7 @@ package ru.practicum.shareit.booking.repository;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.Status;
 
@@ -33,34 +34,25 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     List<Booking> findAllByItem_Owner_IdAndStatus(Long userId, Status status);
 
-    @Query("SELECT b " +
-            "FROM Booking b " +
-            "WHERE b.item.id = ?1")
-    List<Booking> findAllByItemId(Long itemId);
+    Booking findFirstByItem_IdAndItem_Owner_IdAndStartIsBefore(
+            Long itemId, Long userId, LocalDateTime end, Sort sort);
 
-    @Query("SELECT b " +
-            "FROM Booking b " +
-            "WHERE b.item.id = ?1 " +
-            "AND b.item.owner.id = ?2 " +
-            "AND b.start <= ?3 " +
-            "AND (b.status != 'REJECTED' AND b.status != 'CANCELED')" +
-            "ORDER BY b.end DESC ")
-    List<Booking> findLastBooking(Long itemId, Long userId, LocalDateTime now);
+    List<Booking> findFirstByItem_IdInAndItem_Owner_IdAndStartIsBefore(
+            List<Long> itemsId, Long userId, LocalDateTime end, Sort sort);
 
-    @Query("SELECT b " +
-            "FROM Booking b " +
-            "WHERE b.item.id = ?1 " +
-            "AND b.item.owner.id = ?2 " +
-            "AND b.start >= ?3 " +
-            "AND (b.status != 'REJECTED' AND b.status != 'CANCELED')" +
-            "ORDER BY b.start ASC")
-    List<Booking> findNextBooking(Long itemId, Long userId, LocalDateTime now);
+    Booking findFirstByItem_IdAndItem_Owner_IdAndStartIsAfterAndStatusIsNotAndStatusIsNot(
+            Long itemId, Long userId, LocalDateTime start, Status status1, Status status2, Sort sort);
+
+    List<Booking> findFirstByItem_IdInAndItem_Owner_IdAndStartIsAfterAndStatusIsNotAndStatusIsNot(
+            List<Long> itemsId, Long userId, LocalDateTime start, Status status1, Status status2, Sort sort);
 
     @Query("SELECT (COUNT(b) > 0) " +
             "FROM Booking b " +
-            "WHERE b.item.id = ?1 " +
-            "AND b.booker.id = ?2 " +
-            "AND b.end < ?3")
-    boolean isItemWasUsedByUser(Long itemId, Long userId, LocalDateTime now);
+            "WHERE b.item.id = :itemId " +
+            "AND b.booker.id = :userId " +
+            "AND b.end < :now")
+    boolean isItemWasUsedByUser(@Param("itemId") Long itemId,
+                                @Param("userId") Long userId,
+                                @Param("now") LocalDateTime now);
 
 }

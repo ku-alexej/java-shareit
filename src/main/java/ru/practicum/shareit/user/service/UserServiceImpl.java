@@ -68,7 +68,6 @@ public class UserServiceImpl implements UserService {
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
         log.info("User with ID {} was deleted", id);
-
     }
 
     private boolean isUsersMailInBase(UserDto userDto) {
