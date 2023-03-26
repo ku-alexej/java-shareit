@@ -37,8 +37,8 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class ItemServiceImpl implements ItemService {
 
-    private final static Sort SORT_DESC = Sort.by(Sort.Direction.DESC, "end");
-    private final static Sort SORT_ASC = Sort.by(Sort.Direction.ASC, "start");
+    private static final Sort SORT_DESC = Sort.by(Sort.Direction.DESC, "end");
+    private static final Sort SORT_ASC = Sort.by(Sort.Direction.ASC, "start");
 
     private final UserService userService;
     private final BookingRepository bookingRepository;
