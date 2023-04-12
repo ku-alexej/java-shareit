@@ -2,6 +2,8 @@ package ru.practicum.shareit.item.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.InfoBookingDto;
@@ -18,7 +20,8 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.mapper.EntityMapper;
-import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.user.service.UserService;
@@ -45,13 +48,20 @@ public class ItemServiceImpl implements ItemService {
     private final CommentRepository commentRepository;
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
+    private final ItemRequestRepository itemRequestRepository;
     private final EntityMapper mapper;
 
     @Override
     public ItemDto createItem(Long userId, ItemDto itemDto) throws EntityNotFoundException {
-        UserDto owner = userService.getUser(userId);
-        itemDto.setOwner(mapper.toUser(owner));
-        return mapper.toItemDto(itemRepository.save(mapper.toItem(itemDto)));
+        User owner = mapper.toUser(userService.getUser(userId));
+        ItemRequest request = null;
+        if (itemDto.getRequestId() != null) {
+            request = itemRequestRepository.findById(itemDto.getRequestId())
+                    .orElseThrow(() -> new EntityNotFoundException(
+                            "ItemRequest with ID " + itemDto.getRequestId() + " does not exist"));
+        }
+        Item item = mapper.toItem(itemDto, owner, request);
+        return mapper.toItemDto(itemRepository.save(item));
     }
 
     @Override
@@ -104,13 +114,14 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<AnswerItemDto> getItemsByUser(Long userId) {
+    public List<AnswerItemDto> getItemsByUser(Long userId, int from, int size) {
         if (!userRepository.existsById(userId)) {
             throw new EntityNotFoundException("User with ID " + userId + " does not exist");
         }
+        Pageable pageable = PageRequest.of(calcPageNumber(from, size), size);
 
         LocalDateTime now = LocalDateTime.now();
-        List<Item> items = itemRepository.findByOwner_Id(userId);
+        List<Item> items = itemRepository.findByOwner_Id(userId, pageable);
         List<Long> itemsId = items
                 .stream()
                 .map(Item::getId)
@@ -167,11 +178,12 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> getAvailableItems(Long userId, String text) {
+    public List<ItemDto> getAvailableItems(Long userId, String text, int from, int size) {
+        Pageable pageable = PageRequest.of(calcPageNumber(from, size), size);
         if (text.isBlank()) {
             return new ArrayList<>();
         } else {
-            return itemRepository.searchAvailableItems("%" + text + "%")
+            return itemRepository.searchAvailableItems("%" + text + "%", pageable)
                     .stream()
                     .map(mapper::toItemDto)
                     .collect(Collectors.toList());
@@ -190,6 +202,13 @@ public class ItemServiceImpl implements ItemService {
         } else {
             throw new EntityNotAvailable("User with ID " + userId + " has not finished renting item ID " + itemId);
         }
+    }
+
+    private int calcPageNumber(int from, int size) {
+        if (from < 0 || size < 1) {
+            throw new EntityNotAvailable("Invalid \"size\" or \"from\"");
+        }
+        return from / size;
     }
 
 }

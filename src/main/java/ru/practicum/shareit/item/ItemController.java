@@ -51,16 +51,23 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<AnswerItemDto> getItemsByUser(@RequestHeader("X-Sharer-User-Id") Long userId) {
-        log.info("GET /items : get list of items from user ID {}", userId);
-        return itemService.getItemsByUser(userId);
+    public List<AnswerItemDto> getItemsByUser(
+            @RequestHeader("X-Sharer-User-Id") Long userId,
+            @RequestParam(value = "from", defaultValue = "0", required = false) int from,
+            @RequestParam(value = "size", defaultValue = "10", required = false) int size) {
+        log.info("GET /items?from={}&size={} : get list of items from user ID {}", from, size, userId);
+        return itemService.getItemsByUser(userId, from, size);
     }
 
     @GetMapping("/search")
-    public List<ItemDto> getUsersAvailableItems(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                                @RequestParam String text) {
-        log.info("GET /items/search?text={} : get list of available items of user ID {} with text", text, userId);
-        return itemService.getAvailableItems(userId, text);
+    public List<ItemDto> getUsersAvailableItems(
+            @RequestHeader("X-Sharer-User-Id") Long userId,
+            @RequestParam String text,
+            @RequestParam(value = "from", defaultValue = "0", required = false) int from,
+            @RequestParam(value = "size", defaultValue = "10", required = false) int size) {
+        log.info("GET /items/search?text={}&from={}&size={} : get list of available items of user ID {} with text",
+                text, from, size, userId);
+        return itemService.getAvailableItems(userId, text, from, size);
     }
 
     @PostMapping("/{itemId}/comment")

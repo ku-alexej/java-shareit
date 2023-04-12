@@ -1,11 +1,6 @@
 package ru.practicum.shareit.request.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.Column;
@@ -16,6 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 
 @Entity
@@ -24,6 +20,7 @@ import java.time.LocalDateTime;
 @Setter
 @ToString
 @EqualsAndHashCode
+@Builder
 @RequiredArgsConstructor
 @AllArgsConstructor
 public class ItemRequest {
@@ -32,6 +29,7 @@ public class ItemRequest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "ItemRequest's description missing")
     @Column(name = "description")
     private String description;
 

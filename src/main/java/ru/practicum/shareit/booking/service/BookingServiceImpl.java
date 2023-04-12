@@ -2,6 +2,7 @@ package ru.practicum.shareit.booking.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -93,7 +94,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<AnswerBookingDto> getAllBookingByUser(Long userId, String rawState) {
+    public List<AnswerBookingDto> getAllBookingByUser(Long userId, String rawState, int from, int size) {
         State state = getState(rawState);
         if (!userRepository.existsById(userId)) {
             throw new EntityNotFoundException("User with ID " + userId + " does not exist");
@@ -101,7 +102,8 @@ public class BookingServiceImpl implements BookingService {
         List<Booking> bookings = new ArrayList<>();
         switch (state) {
             case ALL:
-                bookings = bookingRepository.findAllByBooker_IdOrderByStartDesc(userId);
+                bookings = bookingRepository.findAllByBooker_IdOrderByStartDesc(
+                        userId, PageRequest.of(calcPageNumber(from, size), size));
                 break;
             case PAST:
                 bookings = bookingRepository.findAllByBooker_IdAndEndIsBefore(userId, LocalDateTime.now(), SORT);
@@ -127,7 +129,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<AnswerBookingDto> getAllBookingByOwner(Long userId, String rawState) {
+    public List<AnswerBookingDto> getAllBookingByOwner(Long userId, String rawState, int from, int size) {
         State state = getState(rawState);
         if (!userRepository.existsById(userId)) {
             throw new EntityNotFoundException("User with ID " + userId + " does not exist");
@@ -135,7 +137,8 @@ public class BookingServiceImpl implements BookingService {
         List<Booking> bookings = new ArrayList<>();
         switch (state) {
             case ALL:
-                bookings = bookingRepository.findAllByItem_Owner_IdOrderByStartDesc(userId);
+                bookings = bookingRepository.findAllByItem_Owner_IdOrderByStartDesc(
+                        userId, PageRequest.of(calcPageNumber(from, size), size));
                 break;
             case PAST:
                 bookings = bookingRepository.findAllByItem_Owner_IdAndEndIsBefore(userId, LocalDateTime.now(), SORT);
@@ -171,4 +174,10 @@ public class BookingServiceImpl implements BookingService {
         return state;
     }
 
+    private int calcPageNumber(int from, int size) {
+        if (from < 0 || size < 1) {
+            throw new EntityNotAvailable("Invalid \"size\" or \"from\"");
+        }
+        return from / size;
+    }
 }

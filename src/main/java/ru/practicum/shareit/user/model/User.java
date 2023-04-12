@@ -2,11 +2,11 @@ package ru.practicum.shareit.user.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.Hibernate;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -22,6 +22,7 @@ import javax.validation.constraints.NotBlank;
 @Getter
 @Setter
 @ToString
+@EqualsAndHashCode(of = "email")
 @RequiredArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -40,16 +41,4 @@ public class User {
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        User user = (User) o;
-        return email.equals(user.email);
-    }
-
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
-    }
 }
