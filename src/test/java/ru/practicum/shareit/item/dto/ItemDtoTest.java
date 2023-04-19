@@ -23,7 +23,7 @@ class ItemDtoTest {
             null);
 
     @Test
-    void ItemDto() throws Exception {
+    void itemDto() throws Exception {
         var res = json.write(itemDto);
 
         assertThat(res).hasJsonPath("$.id");

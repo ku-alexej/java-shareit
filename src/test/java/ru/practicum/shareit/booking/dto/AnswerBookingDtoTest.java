@@ -40,7 +40,7 @@ class AnswerBookingDtoTest {
             Status.WAITING);
 
     @Test
-    void AnswerBookingDto() throws Exception {
+    void answerBookingDto() throws Exception {
         var res = json.write(answerBookingDto);
 
         assertThat(res).hasJsonPath("$.id");

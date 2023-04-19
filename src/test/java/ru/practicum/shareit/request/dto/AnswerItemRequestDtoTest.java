@@ -35,7 +35,7 @@ class AnswerItemRequestDtoTest {
             null);
 
     @Test
-    void itemRequestResponseDto() throws Exception {
+    void answerItemRequestDto() throws Exception {
         List<ItemDto> items = new ArrayList<>();
         items.add(itemDto);
         answerItemRequestDto.setItems(items);

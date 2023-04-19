@@ -115,7 +115,7 @@ class UserServiceImplTest {
 
     @Test
     void updateUser_MailWasUsedByAnotherUser() {
-        User user2 = new User (2L, "user2", "mail2@ya.ru");
+        User user2 = new User(2L, "user2", "mail2@ya.ru");
         UserDto newUserDto = new UserDto(null, null, "mail2@ya.ru");
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
         when(userRepository.findAll()).thenReturn(List.of(user2));

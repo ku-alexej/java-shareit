@@ -36,7 +36,7 @@ class AnswerItemDtoTest {
             List.of(commentDto));
 
     @Test
-    void AnswerItemDto() throws Exception {
+    void answerItemDto() throws Exception {
         var res = json.write(answerItemDto);
 
         assertThat(res).hasJsonPath("$.id");
