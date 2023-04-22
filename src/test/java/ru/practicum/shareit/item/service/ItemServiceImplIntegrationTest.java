@@ -3,10 +3,11 @@ package ru.practicum.shareit.item.service;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.booking.repository.BookingRepository;
-import ru.practicum.shareit.exceptions.EntityNotAvailable;
 import ru.practicum.shareit.exceptions.EntityNotFoundException;
 import ru.practicum.shareit.item.dto.AnswerItemDto;
 import ru.practicum.shareit.item.dto.CommentDto;
@@ -150,6 +151,7 @@ class ItemServiceImplIntegrationTest {
     @Test
     void getItem() {
         LocalDateTime now = LocalDateTime.now();
+
         User booker = new User();
         booker.setName("booker");
         booker.setEmail("booker@ya.ru");
@@ -195,6 +197,8 @@ class ItemServiceImplIntegrationTest {
 
     @Test
     void getItemsByUser() {
+        Pageable pageable =  PageRequest.of(0, 10);
+
         User user = new User();
         user.setName("Alex");
         user.setEmail("alex@ya.ru");
@@ -220,7 +224,7 @@ class ItemServiceImplIntegrationTest {
         comment.setItem(savedItem1);
         commentRepository.save(comment);
 
-        List<AnswerItemDto> items = itemService.getItemsByUser(user.getId(), 0, 10);
+        List<AnswerItemDto> items = itemService.getItemsByUser(user.getId(), pageable);
 
         assertNotNull(items);
         assertEquals(items.size(), 2);
@@ -231,31 +235,9 @@ class ItemServiceImplIntegrationTest {
     }
 
     @Test
-    void getItemsByUser_wrongDataForPagination() {
-        User user = new User();
-        user.setName("Alex");
-        user.setEmail("alex@ya.ru");
-        User savedUser = userRepository.save(user);
-
-        Item item1 = new Item();
-        item1.setName("item1");
-        item1.setDescription("desc1");
-        item1.setAvailable(true);
-        item1.setOwner(savedUser);
-        itemRepository.save(item1);
-
-        Item item2 = new Item();
-        item2.setName("item2");
-        item2.setDescription("desc2");
-        item2.setAvailable(true);
-        item2.setOwner(savedUser);
-        itemRepository.save(item2);
-
-        assertThrows(EntityNotAvailable.class, () -> itemService.getItemsByUser(user.getId(), -1, 0));
-    }
-
-    @Test
     void getAvailableItems() {
+        Pageable pageable =  PageRequest.of(0, 10);
+
         User user = new User();
         user.setName("Alex");
         user.setEmail("alex@ya.ru");
@@ -282,7 +264,7 @@ class ItemServiceImplIntegrationTest {
         item3.setOwner(savedUser);
         itemRepository.save(item3);
 
-        List<ItemDto> items = itemService.getAvailableItems(user.getId(), "sea", 0, 10);
+        List<ItemDto> items = itemService.getAvailableItems(user.getId(), "sea", pageable);
 
         assertNotNull(items);
         assertEquals(items.size(), 1);

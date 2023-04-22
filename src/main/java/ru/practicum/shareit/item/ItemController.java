@@ -2,6 +2,7 @@ package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -11,12 +12,15 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import ru.practicum.shareit.exceptions.EntityNotAvailable;
 import ru.practicum.shareit.item.dto.AnswerItemDto;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 
@@ -55,19 +59,25 @@ public class ItemController {
             @RequestHeader("X-Sharer-User-Id") Long userId,
             @RequestParam(value = "from", defaultValue = "0", required = false) int from,
             @RequestParam(value = "size", defaultValue = "10", required = false) int size) {
+        if (from < 0 || size < 1) {
+            throw new EntityNotAvailable("Invalid \"size\" or \"from\"");
+        }
         log.info("GET /items?from={}&size={} : get list of items from user ID {}", from, size, userId);
-        return itemService.getItemsByUser(userId, from, size);
+        return itemService.getItemsByUser(userId, PageRequest.of(from / size, size));
     }
 
     @GetMapping("/search")
     public List<ItemDto> getUsersAvailableItems(
             @RequestHeader("X-Sharer-User-Id") Long userId,
             @RequestParam String text,
-            @RequestParam(value = "from", defaultValue = "0", required = false) int from,
-            @RequestParam(value = "size", defaultValue = "10", required = false) int size) {
+            @PositiveOrZero @RequestParam(value = "from", defaultValue = "0", required = false) int from,
+            @Positive @RequestParam(value = "size", defaultValue = "10", required = false) int size) {
+        if (from < 0 || size < 1) {
+            throw new EntityNotAvailable("Invalid \"size\" or \"from\"");
+        }
         log.info("GET /items/search?text={}&from={}&size={} : get list of available items of user ID {} with text",
                 text, from, size, userId);
-        return itemService.getAvailableItems(userId, text, from, size);
+        return itemService.getAvailableItems(userId, text, PageRequest.of(from / size, size));
     }
 
     @PostMapping("/{itemId}/comment")

@@ -15,14 +15,10 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
     @Query("SELECT i " +
             "FROM Item i " +
             "WHERE i.available = true " +
-            "AND ((LOWER(i.name) LIKE LOWER(:text)) " +
-            "OR (LOWER(i.description) LIKE LOWER (:text)))")
+            "AND ((LOWER(i.name) LIKE LOWER(concat('%',:text,'%'))) " +
+            "OR (LOWER(i.description) LIKE LOWER(concat('%',:text,'%'))))")
     List<Item> searchAvailableItems(@Param("text") String text, Pageable pageable);
 
-    @Query("SELECT i " +
-            "FROM Item i " +
-            "WHERE i.request.id = :userId " +
-            "ORDER BY i.id DESC")
-    List<Item> findAllByRequesterId(@Param("userId") Long userId);
+    List<Item> findAllByRequest_IdOrderByIdDesc(Long userId);
 
 }

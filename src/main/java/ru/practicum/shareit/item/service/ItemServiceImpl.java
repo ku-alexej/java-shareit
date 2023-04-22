@@ -2,7 +2,6 @@ package ru.practicum.shareit.item.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -114,11 +113,10 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<AnswerItemDto> getItemsByUser(Long userId, int from, int size) {
+    public List<AnswerItemDto> getItemsByUser(Long userId, Pageable pageable) {
         if (!userRepository.existsById(userId)) {
             throw new EntityNotFoundException("User with ID " + userId + " does not exist");
         }
-        Pageable pageable = PageRequest.of(calcPageNumber(from, size), size);
 
         LocalDateTime now = LocalDateTime.now();
         List<Item> items = itemRepository.findByOwner_Id(userId, pageable);
@@ -178,12 +176,11 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> getAvailableItems(Long userId, String text, int from, int size) {
-        Pageable pageable = PageRequest.of(calcPageNumber(from, size), size);
+    public List<ItemDto> getAvailableItems(Long userId, String text, Pageable pageable) {
         if (text.isBlank()) {
             return new ArrayList<>();
         } else {
-            return itemRepository.searchAvailableItems("%" + text + "%", pageable)
+            return itemRepository.searchAvailableItems(text, pageable)
                     .stream()
                     .map(mapper::toItemDto)
                     .collect(Collectors.toList());
@@ -202,13 +199,6 @@ public class ItemServiceImpl implements ItemService {
         } else {
             throw new EntityNotAvailable("User with ID " + userId + " has not finished renting item ID " + itemId);
         }
-    }
-
-    private int calcPageNumber(int from, int size) {
-        if (from < 0 || size < 1) {
-            throw new EntityNotAvailable("Invalid \"size\" or \"from\"");
-        }
-        return from / size;
     }
 
 }

@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exceptions.EntityNotAvailable;
@@ -29,8 +31,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static ru.practicum.shareit.booking.model.Status.APPROVED;
 
@@ -70,9 +77,11 @@ class ItemServiceImplTest {
     ItemRequest request1;
     Booking booking1;
     Booking booking2;
+    Pageable pageable;
 
     @BeforeEach
     void beforeEach() {
+        pageable =  PageRequest.of(0, 10);
         itemService = new ItemServiceImpl(userService, bookingRepository, commentRepository,
                 itemRepository, userRepository, itemRequestRepository, mapper);
         user1 = new User(1L, "user1", "mail1@ya.ru");
@@ -86,6 +95,7 @@ class ItemServiceImplTest {
                 item1, user2, APPROVED);
         booking2 = new Booking(2L, LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2),
                 item1, user2, APPROVED);
+
     }
 
     @Test
@@ -179,7 +189,7 @@ class ItemServiceImplTest {
         when(bookingRepository.findFirstByItem_IdInAndItem_Owner_IdAndStartIsAfterAndStatusIsNotAndStatusIsNot(
                 any(), anyLong(), any(), any(), any(), any())).thenReturn(List.of(booking2));
 
-        List<AnswerItemDto> res = itemService.getItemsByUser(user1.getId(), 0, 10);
+        List<AnswerItemDto> res = itemService.getItemsByUser(user1.getId(), pageable);
 
         assertEquals(res.size(), 2);
 
@@ -210,14 +220,14 @@ class ItemServiceImplTest {
     void getItemsByUser_wrongUser() {
         when(userRepository.existsById(anyLong())).thenReturn(false);
 
-        assertThrows(EntityNotFoundException.class, () -> itemService.getItemsByUser(99L, 0, 10));
+        assertThrows(EntityNotFoundException.class, () -> itemService.getItemsByUser(99L, pageable));
     }
 
     @Test
     void getAvailableItems() {
         when(itemRepository.searchAvailableItems(anyString(), any())).thenReturn(List.of(item1, item2));
 
-        List<ItemDto> res = itemService.getAvailableItems(user1.getId(), "item", 0, 10);
+        List<ItemDto> res = itemService.getAvailableItems(user1.getId(), "item", pageable);
 
         assertEquals(res.size(), 2);
 
@@ -240,15 +250,9 @@ class ItemServiceImplTest {
 
     @Test
     void getAvailableItems_withBlankText() {
-        List<ItemDto> res = itemService.getAvailableItems(user1.getId(), "       ", 0, 10);
+        List<ItemDto> res = itemService.getAvailableItems(user1.getId(), "       ", pageable);
 
         assertEquals(res.size(), 0);
-    }
-
-    @Test
-    void getAvailableItems_withWrongDataForCalcPageNumber() {
-        assertThrows(EntityNotAvailable.class,
-                () -> itemService.getAvailableItems(user1.getId(), "text", 0, 0));
     }
 
     @Test

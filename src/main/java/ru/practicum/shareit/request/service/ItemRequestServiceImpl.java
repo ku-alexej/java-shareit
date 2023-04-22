@@ -2,9 +2,8 @@ package ru.practicum.shareit.request.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.exceptions.EntityNotAvailable;
 import ru.practicum.shareit.exceptions.EntityNotFoundException;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.mapper.EntityMapper;
@@ -44,23 +43,19 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         }
         List<ItemRequest> requests = itemRequestRepository.findAllByRequesterIdOrderByCreatedDesc(userId);
         return requests.stream()
-                .map(req -> mapper.toAnswerItemRequestDto(req, itemRepository.findAllByRequesterId(req.getId())))
+                .map(req -> mapper.toAnswerItemRequestDto(req, itemRepository.findAllByRequest_IdOrderByIdDesc(req.getId())))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<AnswerItemRequestDto> getItemRequests(Long userId, int size, int from) {
-        if (size < 1 || from < 0) {
-            throw new EntityNotAvailable("Invalid \"size\" or \"from\"");
-        }
+    public List<AnswerItemRequestDto> getItemRequests(Long userId, Pageable pageable) {
         if (!userRepository.existsById(userId)) {
             throw new EntityNotFoundException("User with ID " + userId + " does not exist");
         }
-        int page = from / size;
-        List<ItemRequest> requests = itemRequestRepository.findRequestsWithoutOwner(userId, PageRequest.of(page, size));
+        List<ItemRequest> requests = itemRequestRepository.findRequestsWithoutOwner(userId, pageable);
         return requests.stream()
                 .map(request -> mapper.toAnswerItemRequestDto(request,
-                        itemRepository.findAllByRequesterId(request.getId())))
+                        itemRepository.findAllByRequest_IdOrderByIdDesc(request.getId())))
                 .collect(Collectors.toList());
     }
 
@@ -71,7 +66,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         }
         ItemRequest itemRequest = itemRequestRepository.findById(requestId)
                 .orElseThrow(() -> new EntityNotFoundException("ItemRequest with ID " + requestId + " does not exist"));
-        return mapper.toAnswerItemRequestDto(itemRequest, itemRepository.findAllByRequesterId(itemRequest.getId()));
+        return mapper.toAnswerItemRequestDto(itemRequest, itemRepository.findAllByRequest_IdOrderByIdDesc(itemRequest.getId()));
     }
 
 }

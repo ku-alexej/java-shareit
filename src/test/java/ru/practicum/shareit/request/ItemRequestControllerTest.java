@@ -21,7 +21,6 @@ import java.util.List;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -119,7 +118,7 @@ class ItemRequestControllerTest {
 
     @Test
     void getAllRequest() throws Exception {
-        when(itemRequestService.getItemRequests(anyLong(),anyInt(),anyInt()))
+        when(itemRequestService.getItemRequests(anyLong(),any()))
                 .thenReturn(List.of(answerItemRequestDto));
 
         mockMvc.perform(get("/requests/all")
@@ -130,4 +129,45 @@ class ItemRequestControllerTest {
                 .andExpect(jsonPath("$[0].id", is(itemRequestDto.getId()), Long.class))
                 .andExpect(jsonPath("$[0].description", is(itemRequestDto.getDescription()), String.class));
     }
+
+    @Test
+    void getAllRequest_withPagination() throws Exception {
+        when(itemRequestService.getItemRequests(anyLong(),any()))
+                .thenReturn(List.of(answerItemRequestDto));
+
+        mockMvc.perform(get("/requests/all")
+                        .header("X-Sharer-User-Id", 1)
+                        .param("from", "1")
+                        .param("size", "5"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(content().json(mapper.writeValueAsString(List.of(answerItemRequestDto))))
+                .andExpect(jsonPath("$[0].id", is(itemRequestDto.getId()), Long.class))
+                .andExpect(jsonPath("$[0].description", is(itemRequestDto.getDescription()), String.class));
+    }
+
+    @Test
+    void getAllRequest_withWrongFrom() throws Exception {
+        when(itemRequestService.getItemRequests(anyLong(),any()))
+                .thenReturn(List.of(answerItemRequestDto));
+
+        mockMvc.perform(get("/requests/all")
+                        .header("X-Sharer-User-Id", 1)
+                        .param("from", "-5")
+                        .param("size", "5"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void getAllRequest_withWrongSize() throws Exception {
+        when(itemRequestService.getItemRequests(anyLong(),any()))
+                .thenReturn(List.of(answerItemRequestDto));
+
+        mockMvc.perform(get("/requests/all")
+                        .header("X-Sharer-User-Id", 1)
+                        .param("from", "0")
+                        .param("size", "0"))
+                .andExpect(status().isBadRequest());
+    }
+
 }

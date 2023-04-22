@@ -24,9 +24,13 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -140,8 +144,7 @@ class BookingControllerTest {
 
     @Test
     void getAllBookingByUser() throws Exception {
-        when(bookingService.getAllBookingByUser(anyLong(), any(), anyInt(), anyInt()))
-                .thenReturn(List.of(answerBookingDto));
+        when(bookingService.getAllBookingByUser(anyLong(), any(), any())).thenReturn(List.of(answerBookingDto));
 
         mockMvc.perform(get("/bookings")
                         .header("X-Sharer-User-Id", 1L)
@@ -158,8 +161,7 @@ class BookingControllerTest {
 
     @Test
     void getAllBookingByOwner() throws Exception {
-        when(bookingService.getAllBookingByOwner(anyLong(), any(), anyInt(), anyInt()))
-                .thenReturn(List.of(answerBookingDto));
+        when(bookingService.getAllBookingByOwner(anyLong(), any(), any())).thenReturn(List.of(answerBookingDto));
 
         mockMvc.perform(get("/bookings/owner")
                         .header("X-Sharer-User-Id", 1L)

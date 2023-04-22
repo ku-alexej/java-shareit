@@ -23,10 +23,16 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = ItemController.class)
 @AutoConfigureMockMvc
@@ -167,7 +173,7 @@ class ItemControllerTest {
 
     @Test
     void getItemsByUser() throws Exception {
-        when(itemService.getItemsByUser(anyLong(), anyInt(), anyInt())).thenReturn(List.of(answerItemDto));
+        when(itemService.getItemsByUser(anyLong(), any())).thenReturn(List.of(answerItemDto));
 
         mockMvc.perform(get("/items")
                         .header("X-Sharer-User-Id", "1")
@@ -186,8 +192,19 @@ class ItemControllerTest {
     }
 
     @Test
+    void getItemsByUser_withWrongPagination() throws Exception {
+        when(itemService.getItemsByUser(anyLong(), any())).thenReturn(List.of(answerItemDto));
+
+        mockMvc.perform(get("/items")
+                        .header("X-Sharer-User-Id", "1")
+                        .param("from", "-1")
+                        .param("size", "0"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     void getUsersAvailableItems() throws Exception {
-        when(itemService.getAvailableItems(anyLong(), anyString(), anyInt(), anyInt())).thenReturn(List.of(itemDto));
+        when(itemService.getAvailableItems(anyLong(), anyString(), any())).thenReturn(List.of(itemDto));
 
         mockMvc.perform(get("/items/search")
                         .header("X-Sharer-User-Id", "1")
@@ -201,6 +218,17 @@ class ItemControllerTest {
                 .andExpect(jsonPath("$[0].description", is(itemDto.getDescription()), String.class))
                 .andExpect(jsonPath("$[0].available", is(itemDto.getAvailable()), Boolean.class))
                 .andExpect(jsonPath("$[0].requestId", is(itemDto.getRequestId()), Long.class));
+    }
+
+    @Test
+    void getUsersAvailableItems_withWrongPagination() throws Exception {
+        when(itemService.getAvailableItems(anyLong(), anyString(), any())).thenReturn(List.of(itemDto));
+
+        mockMvc.perform(get("/items")
+                        .header("X-Sharer-User-Id", "1")
+                        .param("from", "-1")
+                        .param("size", "0"))
+                .andExpect(status().isBadRequest());
     }
 
     @Test

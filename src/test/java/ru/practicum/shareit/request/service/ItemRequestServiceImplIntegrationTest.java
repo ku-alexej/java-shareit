@@ -3,6 +3,8 @@ package ru.practicum.shareit.request.service;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.request.dto.AnswerItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
@@ -75,6 +77,8 @@ class ItemRequestServiceImplIntegrationTest {
 
     @Test
     void getItemRequests() {
+        Pageable pageable = PageRequest.of(0, 10);
+
         User user = new User();
         user.setName("Alex");
         user.setEmail("alex@ya.ru");
@@ -93,7 +97,7 @@ class ItemRequestServiceImplIntegrationTest {
         requestDto2.setDescription("desc2");
         itemRequestService.createItemRequest(savedUser2.getId(), requestDto2);
 
-        List<AnswerItemRequestDto> res = itemRequestService.getItemRequests(savedUser.getId(), 10, 0);
+        List<AnswerItemRequestDto> res = itemRequestService.getItemRequests(savedUser.getId(), pageable);
 
         assertNotNull(res);
         assertEquals(res.size(), 1);

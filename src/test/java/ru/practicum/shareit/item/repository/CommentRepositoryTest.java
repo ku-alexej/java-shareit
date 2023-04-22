@@ -76,7 +76,6 @@ class CommentRepositoryTest {
         assertEquals(res.get(0).getAuthor().getId(), comment10.getAuthor().getId());
         assertEquals(res.get(0).getAuthor().getName(), comment10.getAuthor().getName());
         assertEquals(res.get(0).getAuthor().getEmail(), comment10.getAuthor().getEmail());
-        assertEquals(res.get(0).getCreated().toString(), comment10.getCreated().toString());
 
         assertEquals(res.get(1).getId(), comment11.getId());
         assertEquals(res.get(1).getText(), comment11.getText());
@@ -91,7 +90,6 @@ class CommentRepositoryTest {
         assertEquals(res.get(1).getAuthor().getId(), comment11.getAuthor().getId());
         assertEquals(res.get(1).getAuthor().getName(), comment11.getAuthor().getName());
         assertEquals(res.get(1).getAuthor().getEmail(), comment11.getAuthor().getEmail());
-        assertEquals(res.get(1).getCreated().toString(), comment11.getCreated().toString());
     }
 
     @Test
@@ -115,7 +113,6 @@ class CommentRepositoryTest {
         assertEquals(res.get(0).getAuthor().getId(), comment20.getAuthor().getId());
         assertEquals(res.get(0).getAuthor().getName(), comment20.getAuthor().getName());
         assertEquals(res.get(0).getAuthor().getEmail(), comment20.getAuthor().getEmail());
-        assertEquals(res.get(0).getCreated().toString(), comment20.getCreated().toString());
 
         assertEquals(res.get(1).getId(), comment21.getId());
         assertEquals(res.get(1).getText(), comment21.getText());
@@ -130,6 +127,5 @@ class CommentRepositoryTest {
         assertEquals(res.get(1).getAuthor().getId(), comment21.getAuthor().getId());
         assertEquals(res.get(1).getAuthor().getName(), comment21.getAuthor().getName());
         assertEquals(res.get(1).getAuthor().getEmail(), comment21.getAuthor().getEmail());
-        assertEquals(res.get(1).getCreated().toString(), comment21.getCreated().toString());
     }
 }

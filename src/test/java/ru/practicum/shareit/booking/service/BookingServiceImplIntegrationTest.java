@@ -3,6 +3,8 @@ package ru.practicum.shareit.booking.service;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import ru.practicum.shareit.booking.dto.AnswerBookingDto;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.Booking;
@@ -393,6 +395,8 @@ class BookingServiceImplIntegrationTest {
     @Test
     void getAllBookingByUser() {
         LocalDateTime now = LocalDateTime.now();
+        Pageable pageable =  PageRequest.of(0, 10);
+
 
         User booker = new User();
         booker.setName("booker");
@@ -441,7 +445,7 @@ class BookingServiceImplIntegrationTest {
         Booking sBooking3 = bookingRepository.save(booking3);
 
         List<AnswerBookingDto> actualBookingsUser = bookingService
-                .getAllBookingByUser(savedBooker.getId(), "ALL", 0, 10);
+                .getAllBookingByUser(savedBooker.getId(), "ALL", pageable);
 
         assertNotNull(actualBookingsUser);
         assertEquals(actualBookingsUser.size(), 2);
@@ -452,6 +456,8 @@ class BookingServiceImplIntegrationTest {
     @Test
     void getAllBookingByOwner() {
         LocalDateTime now = LocalDateTime.now();
+        Pageable pageable =  PageRequest.of(0, 10);
+
 
         User booker = new User();
         booker.setName("booker");
@@ -507,7 +513,7 @@ class BookingServiceImplIntegrationTest {
         bookingRepository.save(booking3);
 
         List<AnswerBookingDto> actualBookingsUser = bookingService
-                .getAllBookingByOwner(savedOwner.getId(), "ALL", 0, 10);
+                .getAllBookingByOwner(savedOwner.getId(), "ALL", pageable);
 
         assertNotNull(actualBookingsUser);
         assertEquals(actualBookingsUser.size(), 2);
