@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item.service;
 
+import org.springframework.data.domain.Pageable;
 import ru.practicum.shareit.item.dto.AnswerItemDto;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -14,9 +15,9 @@ public interface ItemService {
 
     AnswerItemDto getItem(Long itemId, Long userId);
 
-    List<AnswerItemDto> getItemsByUser(Long userId);
+    List<AnswerItemDto> getItemsByUser(Long userId, Pageable pageable);
 
-    List<ItemDto> getAvailableItems(Long userId, String text);
+    List<ItemDto> getAvailableItems(Long userId, String text, Pageable pageable);
 
     CommentDto createComment(Long itemId, Long userId, CommentDto commentDto);
 }

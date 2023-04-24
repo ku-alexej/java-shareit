@@ -1,11 +1,12 @@
 package ru.practicum.shareit.request.model;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import lombok.EqualsAndHashCode;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.Column;
@@ -24,6 +25,7 @@ import java.time.LocalDateTime;
 @Setter
 @ToString
 @EqualsAndHashCode
+@Builder
 @RequiredArgsConstructor
 @AllArgsConstructor
 public class ItemRequest {
