@@ -123,7 +123,6 @@ public class ItemServiceImpl implements ItemService {
         List<Long> itemsId = items
                 .stream()
                 .map(Item::getId)
-//                .sorted()
                 .collect(Collectors.toList());
         List<Comment> allComments = commentRepository.findAllByItemsId(itemsId);
 
